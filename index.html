@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Metas</title>
-    <!-- Cargando Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configurando colores personalizados en Tailwind -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -17,12 +15,12 @@
                     },
                     colors: {
                         dark: {
-                            bg: '#0f172a',    // slate-900
-                            card: '#1e293b',  // slate-800
-                            border: '#334155' // slate-700
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
                         },
                         brand: {
-                            glow: '#3b82f6' // blue-500
+                            glow: '#3b82f6'
                         }
                     },
                     animation: {
@@ -32,15 +30,12 @@
             }
         }
     </script>
-    <!-- Cargando fuente Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Iconos Phosphor -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        /* Estilos personalizados para animaciones y scrollbar */
         body { font-family: 'Inter', sans-serif; }
-        
+
         .progress-bar-fill {
             transition: width 1.5s ease-out, background-color 0.5s ease;
         }
@@ -53,20 +48,10 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
-        /* Scrollbar estilizado para el contenedor principal si es necesario */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569; 
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
         .glass-header {
             background: rgba(30, 41, 59, 0.7);
@@ -74,148 +59,210 @@
             -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
+
+        /* ── RESPONSIVE: fila del leaderboard ── */
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 2.5rem 1fr;
+            grid-template-rows: auto auto;
+            gap: 0.25rem 0.75rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            background: rgba(15,23,42,0.5);
+            border: 1px solid rgba(51,65,85,0.4);
+            transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.25rem;
+        }
+        .leaderboard-row:hover {
+            background: #1e293b;
+            border-color: #475569;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        /* Rank badge — fila 1-2, col 1 */
+        .row-rank {
+            grid-column: 1;
+            grid-row: 1 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Nombre — fila 1, col 2 */
+        .row-name {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        /* Barra + monto — fila 2, col 2 */
+        .row-progress {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        /* Desktop: todo en una sola fila */
+        @media (min-width: 768px) {
+            .leaderboard-row {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 1rem;
+                padding: 0.875rem 1.25rem;
+            }
+            .row-rank   { width: 2.5rem; flex-shrink: 0; }
+            .row-name   { width: 200px; flex-shrink: 0; justify-content: flex-start; }
+            .row-progress { flex: 1; flex-direction: column; gap: 0.25rem; }
+            .row-amount { flex-shrink: 0; text-align: right; }
+            .row-amount-mobile { display: none !important; }
+        }
+
+        /* Ocultar "monto" inline en desktop cuando ya está en columna separada */
+        @media (max-width: 767px) {
+            .row-amount { display: none !important; }
+        }
+
+        /* Header responsive */
+        .header-title { font-size: clamp(0.95rem, 3vw, 1.25rem); }
+        .status-badge-text { display: none; }
+        @media (min-width: 480px) {
+            .status-badge-text { display: inline; }
+        }
     </style>
 </head>
-<body class="bg-dark-bg text-slate-200 min-h-screen flex flex-col antialiased selection:bg-brand-glow selection:text-white relative overflow-hidden">
+<body class="bg-dark-bg text-slate-200 min-h-screen flex flex-col antialiased selection:bg-brand-glow selection:text-white relative overflow-x-hidden">
 
-    <!-- Efecto visual de fondo (Glow) -->
+    <!-- Glow background -->
     <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none z-0"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-600/20 blur-[120px] pointer-events-none z-0"></div>
 
-    <!-- Header Fijo -->
-    <header class="glass-header sticky top-0 z-50 w-full px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <i class="ph-fill ph-trophy text-white text-2xl"></i>
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-50 w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <i class="ph-fill ph-trophy text-white text-xl sm:text-2xl"></i>
             </div>
-            <div>
-                <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+            <div class="min-w-0">
+                <h1 class="header-title font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 truncate">
                     Metas del Equipo
                 </h1>
-                <p class="text-xs text-slate-400 font-medium tracking-wider uppercase">Metas de <span id="current-month" class="text-emerald-400 font-bold">...</span></p>
+                <p class="text-[10px] sm:text-xs text-slate-400 font-medium tracking-wider uppercase">
+                    Metas de <span id="current-month" class="text-emerald-400 font-bold">...</span>
+                </p>
             </div>
         </div>
         
-        <div class="flex items-center gap-4">
-            <div id="statusIndicator" class="flex items-center gap-2 text-sm text-slate-400 bg-dark-card px-3 py-1.5 rounded-full border border-dark-border">
-                <span class="relative flex h-2.5 w-2.5">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <div id="statusIndicator" class="flex items-center gap-2 text-sm text-slate-400 bg-dark-card px-2 sm:px-3 py-1.5 rounded-full border border-dark-border">
+                <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                 </span>
-                <span id="statusText">Conectado a Google Sheets</span>
+                <span id="statusText" class="status-badge-text text-xs whitespace-nowrap">Conectado</span>
             </div>
             <button onclick="fetchData()" class="p-2 rounded-lg bg-dark-card border border-dark-border hover:bg-slate-700 hover:text-white transition-colors group" title="Actualizar datos">
-                <i class="ph ph-arrows-clockwise text-xl group-hover:rotate-180 transition-transform duration-500"></i>
+                <i class="ph ph-arrows-clockwise text-lg sm:text-xl group-hover:rotate-180 transition-transform duration-500"></i>
             </button>
         </div>
     </header>
 
-    <!-- Contenedor Principal -->
-    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-8 relative z-10">
+    <!-- Main -->
+    <main class="flex-1 w-full max-w-5xl mx-auto px-3 sm:px-4 py-5 sm:py-8 relative z-10">
         
-        <!-- Estadísticas Rápidas (Opcional, se pueden calcular) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-dark-card/80 border border-dark-border rounded-2xl p-5 backdrop-blur-sm">
-                <p class="text-slate-400 text-sm font-medium mb-1"><i class="ph ph-users mr-1"></i> Equipo Total</p>
-                <h2 id="stat-total-team" class="text-3xl font-bold text-white">0</h2>
+        <!-- Stats cards -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-5 sm:mb-8">
+            <!-- Equipo -->
+            <div class="bg-dark-card/80 border border-dark-border rounded-xl sm:rounded-2xl p-3 sm:p-5 backdrop-blur-sm">
+                <p class="text-slate-400 text-[10px] sm:text-sm font-medium mb-1 flex items-center gap-1">
+                    <i class="ph ph-users text-sm sm:text-base"></i>
+                    <span class="hidden sm:inline">Equipo Total</span>
+                    <span class="sm:hidden">Equipo</span>
+                </p>
+                <h2 id="stat-total-team" class="text-2xl sm:text-3xl font-bold text-white">0</h2>
             </div>
-            <div class="bg-dark-card/80 border border-dark-border rounded-2xl p-5 backdrop-blur-sm relative overflow-hidden">
-                <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
-                <p class="text-slate-400 text-sm font-medium mb-1"><i class="ph ph-trend-up mr-1 text-emerald-400"></i> Superaron la Meta</p>
-                <h2 id="stat-achievers" class="text-3xl font-bold text-emerald-400">0</h2>
+            <!-- Superaron meta -->
+            <div class="bg-dark-card/80 border border-dark-border rounded-xl sm:rounded-2xl p-3 sm:p-5 backdrop-blur-sm relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
+                <p class="text-slate-400 text-[10px] sm:text-sm font-medium mb-1 flex items-center gap-1">
+                    <i class="ph ph-trend-up text-emerald-400 text-sm sm:text-base"></i>
+                    <span class="hidden sm:inline">Superaron la Meta</span>
+                    <span class="sm:hidden">Superaron</span>
+                </p>
+                <h2 id="stat-achievers" class="text-2xl sm:text-3xl font-bold text-emerald-400">0</h2>
             </div>
-            <div class="bg-dark-card/80 border border-dark-border rounded-2xl p-5 backdrop-blur-sm">
-                <p class="text-slate-400 text-sm font-medium mb-1"><i class="ph ph-currency-dollar mr-1"></i> Dinero Total Generado</p>
-                <h2 id="stat-total-money" class="text-3xl font-bold text-white">$0</h2>
+            <!-- Total generado -->
+            <div class="bg-dark-card/80 border border-dark-border rounded-xl sm:rounded-2xl p-3 sm:p-5 backdrop-blur-sm">
+                <p class="text-slate-400 text-[10px] sm:text-sm font-medium mb-1 flex items-center gap-1">
+                    <i class="ph ph-currency-dollar text-sm sm:text-base"></i>
+                    <span class="hidden sm:inline">Total Generado</span>
+                    <span class="sm:hidden">Total</span>
+                </p>
+                <h2 id="stat-total-money" class="text-lg sm:text-3xl font-bold text-white">$0</h2>
             </div>
         </div>
 
-        <!-- Lista / Leaderboard -->
-        <div class="bg-dark-card/50 border border-dark-border rounded-2xl p-1 backdrop-blur-sm shadow-2xl">
-            <!-- Encabezados de la lista (solo visibles en desktop) -->
-            <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-dark-border/50">
-                <div class="col-span-1 text-center">Posición</div>
-                <div class="col-span-3">Nombre</div>
-                <div class="col-span-6">Progreso Mensual</div>
-                <div class="col-span-2 text-right">Valor</div>
+        <!-- Leaderboard -->
+        <div class="bg-dark-card/50 border border-dark-border rounded-xl sm:rounded-2xl p-1 backdrop-blur-sm shadow-2xl">
+            <!-- Encabezados solo desktop -->
+            <div class="hidden md:flex items-center gap-4 px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-dark-border/50">
+                <div class="w-10 text-center flex-shrink-0">Pos.</div>
+                <div style="width:200px" class="flex-shrink-0">Nombre</div>
+                <div class="flex-1">Progreso</div>
+                <div class="w-28 text-right flex-shrink-0">Alcanzado</div>
             </div>
 
-            <!-- Contenedor donde se inyectarán las filas -->
-            <div id="leaderboard-container" class="flex flex-col gap-1 p-2">
-                <!-- Estado de Carga -->
+            <div id="leaderboard-container" class="flex flex-col gap-1 p-1.5 sm:p-2">
                 <div id="loading-state" class="py-12 flex flex-col items-center justify-center text-slate-500">
                     <i class="ph ph-spinner-gap animate-spin text-4xl mb-3 text-brand-glow"></i>
-                    <p>Obteniendo datos de la nube...</p>
+                    <p class="text-sm">Obteniendo datos de la nube...</p>
                 </div>
-                <!-- Las filas se generarán aquí con JavaScript -->
             </div>
         </div>
 
     </main>
 
     <script>
-        // ==========================================
-        // CONFIGURAÇÃO DO GOOGLE SHEETS
-        // ==========================================
-        
-        // O ID já está configurado com o link que você enviou
         const sheetId = '1URae8fWw5QuOLo7FdsQr2KP-OqY69GT6Xu9CFHsowXY'; 
-        
-        // URL para obter os dados como CSV. 
-        // Sua planilha DEVE estar "Publicada na web" (Arquivo > Compartilhar > Publicar na web)
         const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
 
-        // Elementos del DOM
         const container = document.getElementById('leaderboard-container');
         const loadingState = document.getElementById('loading-state');
         const statusText = document.getElementById('statusText');
         const statusIndicator = document.querySelector('#statusIndicator span:first-child');
         const currentMonthElement = document.getElementById('current-month');
         
-        // Formatador de moneda
         const currencyFormatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0
+            style: 'currency', currency: 'USD', maximumFractionDigits: 0
         });
 
-        // Configurar el mes actual
         function updateCurrentMonth() {
-            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            const fecha = new Date();
-            currentMonthElement.textContent = meses[fecha.getMonth()];
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            currentMonthElement.textContent = meses[new Date().getMonth()];
         }
 
-        /**
-         * Función robusta para limpiar y extraer números.
-         * Resuelve el problema de las barras que no funcionan cuando
-         * Google Sheets exporta números con "$", comas o puntos extraños.
-         */
         function parseNumber(val) {
             if (!val) return 0;
-            // Eliminar espacios, símbolos de moneda y letras
-            let cleaned = String(val).replace(/[$€A-Za-z\s]/g, '');
-            // Si viene en formato "1,000.50", eliminamos las comas
-            cleaned = cleaned.replace(/,/g, '');
+            let cleaned = String(val).replace(/[$€A-Za-z\s]/g, '').replace(/,/g, '');
             const num = parseFloat(cleaned);
             return isNaN(num) ? 0 : num;
         }
         
-        /**
-         * Transforma un texto en formato CSV para un Array de Objetos.
-         */
         function parseCSV(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
-            
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
             const data = [];
-
             for (let i = 1; i < lines.length; i++) {
-                // Regex mejorada para dividir por comas, ignorando comillas (formato estándar CSV de Google)
                 const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
                 const values = lines[i].split(regex);
-                
                 const rowObject = {};
                 for (let j = 0; j < headers.length; j++) {
                     let val = values[j] ? values[j].trim().replace(/"/g, '') : '';
@@ -226,75 +273,51 @@
             return data;
         }
 
-        /**
-         * Função principal para obter e mostrar os dados
-         */
         async function fetchData() {
             setLoading(true);
             try {
                 const response = await fetch(csvUrl);
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status} - Verifique se a planilha está publicada.`);
-                }
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
                 const csvData = await response.text();
-                
                 if (csvData.trim().startsWith('<!DOCTYPE html>')) {
-                    throw new Error("O documento não é um CSV válido. Certifique-se de ter 'Publicado na web'.");
+                    throw new Error("La hoja no está publicada como CSV.");
                 }
-
                 const rawData = parseCSV(csvData);
                 processAndRenderData(rawData);
                 setConnectionStatus('Conectado', true);
-
             } catch (error) {
-                console.error("Error al obtener datos:", error);
-                setConnectionStatus('Error de conexión', false);
+                console.error("Error:", error);
+                setConnectionStatus('Error', false);
                 container.innerHTML = `
-                    <div class="py-12 flex flex-col items-center justify-center text-red-400">
+                    <div class="py-12 flex flex-col items-center justify-center text-red-400 px-4">
                         <i class="ph ph-warning-circle text-4xl mb-3"></i>
-                        <p class="font-medium text-center px-4">No se pudo cargar los datos.</p>
+                        <p class="font-medium text-center">No se pudo cargar los datos.</p>
                         <p class="text-sm mt-2 opacity-70 max-w-md text-center">${error.message}</p>
-                    </div>
-                `;
+                    </div>`;
             } finally {
                 setLoading(false);
             }
         }
 
-        /**
-         * Limpa, ordena e renderiza os dados
-         */
         function processAndRenderData(data) {
-            // 1. Limpar e processar dados numéricos
             const validData = data.filter(item => item.Nombre && item.Nombre.trim() !== '');
-            
             const processedData = validData.map(item => {
                 const nombre = item.Nombre || "Desconocido";
-                // Utilizamos el parseador robusto para asegurar que los números no rompan la barra
                 const ventas = parseNumber(item.Progreso);
                 const meta = parseNumber(item.Objetivo);
-                
-                // Calcular porcentaje (evitar división por cero)
                 let percentage = meta > 0 ? (ventas / meta) * 100 : 0;
-                
                 return { nombre, ventas, meta, percentage };
             });
 
-            // 2. Ordenar por porcentaje de cumplimiento (de mayor a menor)
-            // Si prefieres ordenar por ventas totales, cambia p.percentage por p.ventas
             processedData.sort((a, b) => b.percentage - a.percentage);
-
-            // 3. Actualizar Estadísticas Generales
             updateStats(processedData);
+            container.innerHTML = '';
 
-            // 4. Renderizar Filas
-            container.innerHTML = ''; // Limpiar contenedor
-            
             if (processedData.length === 0) {
-                 container.innerHTML = `
+                container.innerHTML = `
                     <div class="py-12 flex flex-col items-center text-slate-500">
                         <i class="ph ph-empty text-4xl mb-3"></i>
-                        <p>No hay datos disponibles en la hoja.</p>
+                        <p>No hay datos disponibles.</p>
                     </div>`;
                 return;
             }
@@ -302,150 +325,123 @@
             processedData.forEach((person, index) => {
                 const rank = index + 1;
                 const isOverGoal = person.ventas >= person.meta;
-                // Limitar la barra visual al 100% aunque el porcentaje sea mayor
-                const visualPercentage = Math.min(person.percentage, 100); 
+                const visualPercentage = Math.min(person.percentage, 100);
 
-                // Determinar colores basados en progreso
                 let barColorClass = "bg-blue-500";
-                let textGlowClass = "";
+                let textColorClass = "text-slate-300";
                 let iconHtml = "";
+                let nameClass = "text-white";
 
                 if (isOverGoal) {
                     barColorClass = "bg-gradient-to-r from-emerald-500 to-green-400";
-                    textGlowClass = "text-emerald-400 font-bold drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]";
-                    iconHtml = `<i class="ph-fill ph-check-circle text-emerald-400 ml-2" title="¡Meta Alcanzada!"></i>`;
+                    textColorClass = "text-emerald-400 font-bold drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]";
+                    nameClass = "text-emerald-50";
+                    iconHtml = `<i class="ph-fill ph-check-circle text-emerald-400" title="¡Meta Alcanzada!"></i>`;
                 } else if (person.percentage >= 80) {
                     barColorClass = "bg-gradient-to-r from-yellow-500 to-amber-400";
                 } else if (person.percentage <= 30) {
-                     barColorClass = "bg-gradient-to-r from-rose-500 to-red-400";
+                    barColorClass = "bg-gradient-to-r from-rose-500 to-red-400";
                 }
 
-                // Generar HTML de la fila
+                // Rank badge styling
+                let rankClass = 'bg-slate-800 text-slate-400 border-dark-border';
+                if (rank === 1) rankClass = 'bg-amber-500/20 text-amber-400 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]';
+                else if (rank === 2) rankClass = 'bg-slate-300/20 text-slate-300 border-slate-400/50';
+                else if (rank === 3) rankClass = 'bg-orange-600/20 text-orange-400 border-orange-600/50';
+
+                const faltaMonto = person.ventas < person.meta
+                    ? `falta ${currencyFormatter.format(person.meta - person.ventas)}`
+                    : '✓ meta cumplida';
+
                 const rowHtml = `
-                    <div class="card-hover-effect flex flex-col md:grid md:grid-cols-12 items-center gap-2 md:gap-4 p-4 rounded-xl bg-dark-bg/50 border border-dark-border/40 hover:bg-dark-card hover:border-slate-600 mb-2 md:mb-0 group">
-                        
-                        <!-- Rango -->
-                        <div class="col-span-1 w-full md:w-auto flex justify-between md:justify-center items-center">
-                            <span class="md:hidden text-xs text-slate-500 uppercase tracking-wide">Posición</span>
-                            <div class="flex items-center justify-center w-8 h-8 rounded-full ${rank === 1 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : rank === 2 ? 'bg-slate-300/20 text-slate-300 border border-slate-400/50' : rank === 3 ? 'bg-orange-600/20 text-orange-400 border border-orange-600/50' : 'bg-slate-800 text-slate-400 border border-dark-border'} font-bold text-sm">
-                                ${rank}
-                            </div>
-                        </div>
-
-                        <!-- Nombre -->
-                        <div class="col-span-3 w-full flex items-center">
-                            <div class="flex-1 truncate">
-                                <h3 class="text-base font-semibold text-white flex items-center ${isOverGoal ? 'text-emerald-50' : ''}">
-                                    ${person.nombre} ${iconHtml}
-                                </h3>
-                                <p class="text-xs text-slate-400 mt-0.5 md:hidden">
-                                    Meta: ${currencyFormatter.format(person.meta)}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Barra de Progreso -->
-                        <div class="col-span-6 w-full flex flex-col justify-center py-2 md:py-0">
-                            <div class="flex justify-between items-end mb-1.5">
-                                <span class="text-xs font-bold ${textGlowClass || 'text-slate-300'}">
-                                    ${person.percentage.toFixed(1)}%
-                                </span>
-                                <span class="text-[10px] text-slate-500 hidden md:inline">
-                                    Meta: ${currencyFormatter.format(person.meta)}
-                                </span>
-                            </div>
-                            <div class="w-full bg-slate-800 rounded-full h-3 md:h-2.5 overflow-hidden border border-slate-700/50 relative">
-                                <div class="progress-bar-fill h-full rounded-full ${barColorClass} relative" 
-                                     style="width: 0%;" 
-                                     data-width="${visualPercentage}%">
-                                     ${isOverGoal ? '<div class="absolute inset-0 bg-white/20 animate-pulse-slow"></div>' : ''}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Monto Logrado -->
-                        <div class="col-span-2 w-full flex justify-between md:justify-end items-center mt-2 md:mt-0">
-                            <span class="md:hidden text-xs text-slate-500 uppercase">Alcanzado</span>
-                            <div class="text-right">
-                                <div class="font-bold text-white tracking-wide ${isOverGoal ? 'text-emerald-400' : ''}">
-                                    ${currencyFormatter.format(person.ventas)}
-                                </div>
-                                <div class="text-[10px] text-slate-500 mt-0.5">
-                                    faltan ${person.ventas < person.meta ? currencyFormatter.format(person.meta - person.ventas) : '$0'}
-                                </div>
-                            </div>
+                <div class="leaderboard-row">
+                    <!-- Rank -->
+                    <div class="row-rank">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full ${rankClass} border font-bold text-sm flex-shrink-0">
+                            ${rank}
                         </div>
                     </div>
-                `;
+
+                    <!-- Nombre + monto (mobile inline) -->
+                    <div class="row-name min-w-0">
+                        <h3 class="text-sm sm:text-base font-semibold ${nameClass} flex items-center gap-1.5 truncate">
+                            <span class="truncate">${person.nombre}</span>
+                            ${iconHtml}
+                        </h3>
+                        <!-- Monto visible solo en mobile (dentro del nombre row) -->
+                        <div class="row-amount-mobile text-right flex-shrink-0 ml-2">
+                            <div class="text-sm font-bold ${isOverGoal ? 'text-emerald-400' : 'text-white'} whitespace-nowrap">
+                                ${currencyFormatter.format(person.ventas)}
+                            </div>
+                            <div class="text-[10px] text-slate-500 whitespace-nowrap">${faltaMonto}</div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de progreso -->
+                    <div class="row-progress">
+                        <div class="flex justify-between items-end">
+                            <span class="text-xs font-bold ${textColorClass}">
+                                ${person.percentage.toFixed(1)}%
+                            </span>
+                            <span class="text-[10px] text-slate-500 hidden sm:inline">
+                                Meta: ${currencyFormatter.format(person.meta)}
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700/50 relative">
+                            <div class="progress-bar-fill h-full rounded-full ${barColorClass} relative"
+                                 style="width: 0%;"
+                                 data-width="${visualPercentage}%">
+                                ${isOverGoal ? '<div class="absolute inset-0 bg-white/20 animate-pulse-slow"></div>' : ''}
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-slate-500 sm:hidden">
+                            Meta: ${currencyFormatter.format(person.meta)}
+                        </div>
+                    </div>
+
+                    <!-- Monto columna (solo desktop) -->
+                    <div class="row-amount w-28 text-right flex-shrink-0">
+                        <div class="font-bold ${isOverGoal ? 'text-emerald-400' : 'text-white'}">
+                            ${currencyFormatter.format(person.ventas)}
+                        </div>
+                        <div class="text-[10px] text-slate-500">${faltaMonto}</div>
+                    </div>
+                </div>`;
+
                 container.insertAdjacentHTML('beforeend', rowHtml);
             });
 
-            // Animar las barras de progreso después de un pequeño retraso
-            // El requestAnimationFrame asegura que el navegador actualice la vista antes de aplicar la animación
             requestAnimationFrame(() => {
                 setTimeout(() => {
-                    const bars = document.querySelectorAll('.progress-bar-fill');
-                    bars.forEach(bar => {
+                    document.querySelectorAll('.progress-bar-fill').forEach(bar => {
                         bar.style.width = bar.getAttribute('data-width');
                     });
                 }, 100);
             });
         }
 
-        /**
-         * Actualiza los widgets de estadísticas en la parte superior
-         */
         function updateStats(data) {
-            const totalTeam = data.length;
-            const achievers = data.filter(p => p.ventas >= p.meta).length;
-            const totalMoney = data.reduce((sum, p) => sum + p.ventas, 0);
-
-            document.getElementById('stat-total-team').innerText = totalTeam;
-            document.getElementById('stat-achievers').innerText = achievers;
-            document.getElementById('stat-total-money').innerText = currencyFormatter.format(totalMoney);
+            document.getElementById('stat-total-team').innerText = data.length;
+            document.getElementById('stat-achievers').innerText = data.filter(p => p.ventas >= p.meta).length;
+            document.getElementById('stat-total-money').innerText = currencyFormatter.format(data.reduce((s, p) => s + p.ventas, 0));
         }
 
-
         function setLoading(isLoading) {
-            if (isLoading) {
-                loadingState.style.display = 'flex';
-                // Solo ocultar contenido si ya hay algo, para evitar parpadeos molestos
-                if(container.children.length > 1) {
-                    Array.from(container.children).forEach(child => {
-                        if(child.id !== 'loading-state') child.style.opacity = '0.5';
-                    });
-                }
-            } else {
-                loadingState.style.display = 'none';
-                Array.from(container.children).forEach(child => {
-                    child.style.opacity = '1';
-                });
-            }
+            loadingState.style.display = isLoading ? 'flex' : 'none';
         }
 
         function setConnectionStatus(text, isOk) {
             statusText.innerText = text;
-            if (isOk) {
-                statusIndicator.innerHTML = `
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                `;
-            } else {
-                statusIndicator.innerHTML = `
-                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
-                `;
-            }
+            statusIndicator.innerHTML = isOk
+                ? `<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                   <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>`
+                : `<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>`;
         }
 
-        // Iniciar la obtención de datos al cargar la página
         window.onload = () => {
             updateCurrentMonth();
             fetchData();
-            
-            // Opcional: Actualizar automáticamente cada X milisegundos (ej. cada 1 minuto = 60000ms)
-            // setInterval(fetchData, 60000); 
         };
-
     </script>
 </body>
 </html>
